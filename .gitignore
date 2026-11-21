@@ -1,0 +1,51 @@
+# Build outputs
+build/
+build-*/
+_build/
+out/
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.obj
+*.o
+*.res
+*.tlog
+
+# Compiled binaries and debug files
+*.exe
+*.dll
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.iobj
+*.ipdb
+*.map
+
+# Runtime data
+*.cfg
+*.bin
+*.jrp
+*.csv
+replay/
+presets/
+
+# Timestamped backups and snapshots
+*.bak-*
+*.original-*
+_snapshots/
+
+# Archives produced for releases
+*.zip
+
+# IDE / OS
+.vs/
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store

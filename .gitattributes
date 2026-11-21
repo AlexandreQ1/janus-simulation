@@ -1,0 +1,10 @@
+# Normalize text files to LF; keep binary assets binary.
+* text=auto eol=lf
+*.pdf binary
+*.ico binary
+*.png binary
+*.jpg binary
+*.exe binary
+*.dll binary
+*.lib binary
+*.zip binary
