@@ -29,9 +29,9 @@ implemented in the 21 November 2026 build. See
 [`../SCIENTIFIC_STATUS.md`](../SCIENTIFIC_STATUS.md) for the scientific status
 and the reference list.
 
-**Known correction — PM grid memory.** The Universe user guide and the in-app
-tooltip quote about 3 GB for a 512³ PM grid. The actual allocation is about
-**17 GiB plus cuFFT workspace** (three zero-padded 1024²×513 complex arrays,
-two density grids and two float4 force fields), so 512³ is not usable on a
-16 GB GPU. Use **64³–256³** on the reference laptop; the breakdown is in the
-HPC roadmap, Section 7.
+**Known correction — PM grid memory.** The Universe user guide still quotes
+about 3 GB for a 512³ PM grid. The in-app tooltip has been corrected, and the
+actual allocation is about **17 GiB plus cuFFT workspace** (three zero-padded
+1024²×513 complex arrays, two density grids and two float4 force fields), so
+512³ is not usable on a 16 GB GPU. Use **64³–256³** on the reference laptop;
+the breakdown is in the HPC roadmap, Section 7.

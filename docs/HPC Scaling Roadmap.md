@@ -179,7 +179,7 @@ accelerations and block-step bookkeeping, budget **~64–96 B/particle**:
 | 300 M | ~19 GB | + ~17 GiB | yes |
 | 1 B | ~64 GB | + ~17 GiB | tight (1 GPU) → multi-GPU |
 
-The 512³ figure is **not** the ~3 GB quoted by the in-app tooltip: `pm_init` allocates three
+The 512³ figure is **not** the ~3 GB quoted in the earlier documentation: `pm_init` allocates three
 zero-padded 1024²×513 complex arrays (~12 GiB), two 512³ float density grids (~1 GiB) and two 512³
 float4 force fields (~4 GiB), plus cuFFT workspace. On the 16 GB reference laptop, the practical PM
 range is **64³–256³**; 512³ cannot be allocated there.

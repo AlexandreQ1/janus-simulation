@@ -7085,8 +7085,9 @@ void App::renderGUI()
                 if (ImGui::Combo("Grid##pm", &idx, grids, 4))
                     m_pmNg = (idx == 0) ? 64 : (idx == 1) ? 128 : (idx == 2) ? 256 : 512;
                 if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip("PM resolution: 64^3 = 8MB, 128^3 = 50MB, 256^3 = 400MB, 512^3 = 3GB\n"
-                                      "Use 512 for Janus soap-bubble structure (requires 4+ GB VRAM)");
+                    ImGui::SetTooltip("PM resolution: 64^3 = 8MB, 128^3 = 50MB, 256^3 = 400MB\n"
+                                      "512^3 = ~17 GiB + FFT workspace (24 GB+ VRAM; not for 16 GB cards)\n"
+                                      "Use 256 for Janus soap-bubble structure on a 16 GB GPU");
 
                 ImGui::Checkbox("Enable SR (P3M)", &m_pmEnableSR);
                 if (ImGui::IsItemHovered())
