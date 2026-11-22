@@ -22,6 +22,10 @@ set(JANUS_VCPKG_ROOT "$ENV{JANUS_VCPKG_ROOT}" CACHE PATH
 set(JANUS_CUDA_ARCH "89" CACHE STRING
     "CUDA compute capability(ies), e.g. 89 or 75;80;86;89;90")
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../cmake")
+include(JanusDependencies)
+janus_imgui_backends(IMGUI_BACKEND_SOURCES)
+
 set(APP_SOURCES
     src/main.cpp
     src/app.cpp
@@ -33,8 +37,7 @@ set(APP_SOURCES
     render/src/matrix.cpp
     render/src/vector.cpp
     render/src/color.cpp
-    render/src/imgui_backends/imgui_impl_sdl2.cpp
-    render/src/imgui_backends/imgui_impl_opengl3.cpp
+    ${IMGUI_BACKEND_SOURCES}
     gpu-nbody/pair3.cu
     gpu-nbody/treepm_force.cu
     gpu-nbody/gl_interop.cu
@@ -48,10 +51,19 @@ set(APP_INCLUDES
     render/src/imgui_backends
 )
 
-add_executable(j-gravity WIN32 ${APP_SOURCES} app_icon.rc)
+add_executable(j-gravity WIN32 ${APP_SOURCES})
+if(WIN32)
+    target_sources(j-gravity PRIVATE app_icon.rc)
+endif()
 
-# User-facing executable name; the CMake target keeps its historical name.
-set_target_properties(j-gravity PROPERTIES OUTPUT_NAME "Janus Galaxy")
+# Keep the Windows display name and use a shell-friendly name on Linux.
+if(WIN32)
+    set_target_properties(j-gravity PROPERTIES OUTPUT_NAME "Janus Galaxy")
+else()
+    set_target_properties(j-gravity PROPERTIES OUTPUT_NAME "janus-galaxy")
+endif()
+set_target_properties(j-gravity PROPERTIES
+    CUDA_ARCHITECTURES "${JANUS_CUDA_ARCH}")
 
 target_include_directories(j-gravity PRIVATE ${APP_INCLUDES})
 
@@ -102,38 +114,26 @@ if(WIN32)
     )
     target_compile_definitions(j-gravity PRIVATE _USE_MATH_DEFINES)
 
-    set_target_properties(j-gravity PROPERTIES
-        CUDA_ARCHITECTURES "${JANUS_CUDA_ARCH}"
-    )
-
-    # Copy the shaders and the two runtime DLLs next to the executable.
     add_custom_command(TARGET j-gravity POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:j-gravity>/render/shaders"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_SOURCE_DIR}/render/shaders"
-            "$<TARGET_FILE_DIR:j-gravity>/render/shaders"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${JANUS_VCPKG_ROOT}/bin/SDL2.dll" "${JANUS_VCPKG_ROOT}/bin/glew32.dll"
             "$<TARGET_FILE_DIR:j-gravity>"
-        COMMENT "Copying OpenGL shaders and runtime DLLs (SDL2, GLEW)"
+        COMMENT "Copying runtime DLLs (SDL2, GLEW)"
     )
 else()
-    find_package(SDL2 REQUIRED)
-    find_package(GLEW REQUIRED)
-    find_package(glm REQUIRED)
-    find_package(imgui CONFIG REQUIRED)
-    target_link_libraries(j-gravity PRIVATE
-        SDL2::SDL2
-        GLEW::GLEW
-        glm::glm
-        CUDA::cudart
-        imgui::imgui
-        GL
-    )
-    set_target_properties(j-gravity PROPERTIES
-        CUDA_ARCHITECTURES "${JANUS_CUDA_ARCH}"
-    )
+    janus_configure_linux(j-gravity)
 endif()
 
 message(STATUS "Janus Galaxy: CUDA architectures = ${JANUS_CUDA_ARCH}")
+
+# Both applications load shaders and equation templates from the working directory.
+add_custom_command(TARGET j-gravity POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/render/shaders"
+        "$<TARGET_FILE_DIR:j-gravity>/render/shaders"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/equations"
+        "$<TARGET_FILE_DIR:j-gravity>/equations"
+    VERBATIM
+    COMMENT "Copying shaders and equation templates"
+)

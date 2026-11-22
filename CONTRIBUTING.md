@@ -7,23 +7,28 @@ masses. The model has not been validated by the wider scientific community; see
 The most useful contributions right now are **platform ports**, build reports and reproducible
 performance measurements.
 
-## Contributions wanted: Linux and macOS
+## Contributions wanted: Linux validation and macOS port
 
-The codebase is currently **Windows x64 only**. It builds with Visual Studio 2022, CUDA 13.1, CMake and
-vcpkg, and the CMake files copy Windows `.dll` files next to the executable. The window layer uses SDL2
-and OpenGL; the compute layer uses CUDA and, in Janus Universe, cuFFT.
+The previously tested platform is **Windows x64**, using Visual Studio 2022, CUDA 13.1,
+CMake and vcpkg. Both Linux CUDA applications now compile on Fedora 44; graphical
+startup and GPU simulation still need validation. The window layer uses SDL2 and OpenGL; the
+compute layer uses CUDA and, in Janus Universe, cuFFT.
 
 ### Linux
 
-A Linux port is the more direct of the two. The main work is:
+The build instructions are in [BUILDING.md](BUILDING.md#linux). CMake now limits
+Windows resources and DLL deployment to Windows, discovers Linux dependencies,
+links Universe to cuFFT, and copies shaders and equation templates on both
+platforms. CMake fetches a pinned Dear ImGui docking release and builds matching
+core/backends. Standard CMake FetchContent overrides support offline builds.
 
-- replace MSVC-specific compiler and linker flags with portable CMake;
-- find SDL2, GLEW, GLM and Dear ImGui through system packages, vcpkg or a submodule;
-- copy or install `libSDL2`, `libGLEW` and the shaders with Linux paths (case-sensitive filesystem);
-- make the CUDA architecture configurable (`JANUS_CUDA_ARCH`) and test on the target GPU;
-- handle the Windows icon resource (`app_icon.rc`) as an optional Windows-only target;
-- check file paths, working-directory assumptions and any Windows API calls;
-- provide a tested build command and, if possible, a CI job;
+The remaining work is:
+
+- report builds on additional Linux/CUDA/compiler configurations;
+- test startup, CUDA/OpenGL interoperability and both simulation solvers;
+- check file paths, case-sensitive resources and working-directory assumptions;
+- validate exports and identify UI features that still require Windows;
+- provide a GPU-backed CI job or reproducible build report;
 - add a packaging recipe (tarball, AppImage or `.deb`) if you can maintain it.
 
 ### macOS

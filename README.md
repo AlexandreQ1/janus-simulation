@@ -20,7 +20,8 @@ compared with observations. It is meant to **support scientific evaluation of th
 it**.
 
 Both applications are written in C++17 with CUDA, OpenGL 3.3, SDL2 and Dear ImGui.
-The current build runs on Windows and is intended for interactive exploration of the Janus force law,
+Windows and Linux builds compile; Linux GPU execution still needs validation. The
+applications are intended for interactive exploration of the Janus force law,
 not for production-grade numerical campaigns.
 
 | Application | What it simulates | Main tools |
@@ -75,17 +76,16 @@ in-situ analysis, with risks and a validation plan. The Markdown source is
 | Platform | Status |
 |---|---|
 | **Windows x64** | Supported; prebuilt binaries and build instructions. |
-| **Linux x86_64** | **Wanted.** The CUDA, SDL2 and OpenGL stack is available; the build system and window layer need a port. |
+| **Linux x86_64** | CUDA Release build compiled on Fedora 44; GPU execution remains unverified. See [BUILDING.md](BUILDING.md#linux). |
 | **macOS** | **Wanted, but a larger project.** Modern macOS has no NVIDIA CUDA support, so the CUDA kernels and cuFFT solver need a Metal, OpenCL or CPU backend. |
 
-**Contributors are needed for the Linux and macOS ports.** The current code is Windows-only: the CMake
-files copy `.dll` files, the build assumes MSVC and vcpkg, the icon uses a Windows resource file, and
-the CUDA path is compiled with the Windows CUDA toolkit. A Linux port is the more direct of the two; a
-macOS port also requires replacing the GPU compute backend.
+**Contributors are needed to validate Linux and implement a macOS port.** The Linux
+configuration now handles dependencies, CUDA/cuFFT linkage and runtime resources.
+It requires an NVIDIA CUDA toolkit; CMake downloads and builds the pinned Dear
+ImGui docking sources automatically. Windows integration features may need additional Linux work. macOS requires replacing the
+GPU compute backend.
 
-If you can help, open an issue titled **“Port to Linux”** or **“Port to macOS”** and describe the
-platform, compiler and GPU you can test. See [CONTRIBUTING.md](CONTRIBUTING.md) for the porting notes
-and the kind of changes involved.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for build reports and porting notes.
 
 ## Downloads
 
@@ -127,7 +127,7 @@ The guides are written in English, without images.
 galaxy/        Janus Galaxy sources (CMake project)
 universe/      Janus Universe sources (CMake project)
 docs/          user guides, technical references, HPC roadmap
-BUILDING.md    Windows build instructions
+BUILDING.md    Windows and Linux build instructions
 CONTRIBUTING.md  ports, build reports, pull-request rules
 SCIENTIFIC_STATUS.md
 LICENSE        MIT licence for this repository
@@ -139,7 +139,11 @@ Each application folder contains `src/`, `render/`, `gpu-nbody/`, `equations/`,
 
 ## Building from source (short version)
 
-Requirements: Windows 10/11 x64, Visual Studio 2022 (C++ x64 + CUDA), CUDA Toolkit
+For Fedora Linux, follow the [package installation and build instructions](BUILDING.md#linux).
+The root CMake
+project builds both applications; the standalone commands below remain supported.
+
+Windows requirements: Windows 10/11 x64, Visual Studio 2022 (C++ x64 + CUDA), CUDA Toolkit
 13.1, CMake 3.18+, and vcpkg with `sdl2 glew glm imgui` installed for the
 `x64-windows` triplet.
 
