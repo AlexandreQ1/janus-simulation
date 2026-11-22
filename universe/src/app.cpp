@@ -1321,14 +1321,14 @@ void App::renderAbout()
     ImGui::TextColored(ImVec4(0.8f,0.8f,0.4f,1), "Project origin");
     ImGui::TextWrapped("42 School Silicon Valley");
     if (ImGui::SmallButton("https://j-gravity.github.io/web-landing/index.html"))
-        ShellExecuteA(NULL,"open","https://j-gravity.github.io/web-landing/index.html",NULL,NULL,SW_SHOWNORMAL);
+        SDL_OpenURL("https://j-gravity.github.io/web-landing/index.html");
     ImGui::Dummy(ImVec2(0,6));
 
     ImGui::TextColored(ImVec4(0.8f,0.8f,0.4f,1), "Janus Cosmological Model - Jean-Pierre Petit");
     ImGui::TextWrapped("Publications:");
     auto link = [](const char* url) {
         if (ImGui::SmallButton(url))
-            ShellExecuteA(NULL,"open",url,NULL,NULL,SW_SHOWNORMAL);
+            SDL_OpenURL(url);
     };
     link("http://www.jp-petit.org/papers/cosmo/2026-Mathematical-and-Geometrical-Inconsistency-of-the-Black-Hole-Model.Part%20I.pdf");
     link("http://www.jp-petit.org/papers/cosmo/2025-10-14-JMP-Alternative-to-Black-Holes-Gravastars-and-Plugstars.pdf");
@@ -3787,10 +3787,9 @@ void App::loadSimState()
 
 void App::saveScreenshot()
 {
-    // Open Save dialog — default to Desktop
-    char filename[MAX_PATH] = "jgravity_screenshot.png";
-
 #ifdef _WIN32
+    // The native dialog writes the selected path into this buffer.
+    char filename[sizeof(m_screenshotPath)] = "jgravity_screenshot.png";
     char desktopPath[MAX_PATH] = {};
     const char* userProfile = getenv("USERPROFILE");
     if (userProfile)
@@ -3801,7 +3800,7 @@ void App::saveScreenshot()
     ofn.hwndOwner    = NULL;
     ofn.lpstrFilter  = "PNG Image (*.png)\0*.png\0All Files (*.*)\0*.*\0";
     ofn.lpstrFile    = filename;
-    ofn.nMaxFile     = MAX_PATH;
+    ofn.nMaxFile     = sizeof(filename);
     ofn.lpstrDefExt  = "png";
     ofn.lpstrTitle   = "Save Screenshot";
     ofn.lpstrInitialDir = desktopPath[0] ? desktopPath : NULL;
@@ -3809,6 +3808,8 @@ void App::saveScreenshot()
 
     if (!GetSaveFileNameA(&ofn))
         return;  // user cancelled
+#else
+    const char* filename = "jgravity_screenshot.png";
 #endif
 
     // Defer the actual capture to the end of the frame, AFTER ImGui has rendered,
